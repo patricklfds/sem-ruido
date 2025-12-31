@@ -2,9 +2,14 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Sem Ruído</title>
     
+    <meta name="description" content="5 Insights essenciais do mercado financeiro, todo dia às 05:00. Sem ruído.">
+    <meta property="og:title" content="Sem Ruído | Briefing Financeiro">
+    <meta property="og:description" content="5 Insights essenciais do mercado financeiro, todo dia às 05:00.">
+    <meta property="og:type" content="website">
+
     <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 font-family=%22serif%22 font-style=%22italic%22 font-weight=%22bold%22 fill=%22%230033cc%22>S</text></svg>">
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -29,6 +34,17 @@
             --border-soft: rgba(255, 255, 255, 0.2);
             --accent: #4d88ff;
             --glow: rgba(77, 136, 255, 0.15);
+        }
+
+        /* --- MELHORIA 1: Seleção de Texto Personalizada --- */
+        ::selection {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        /* --- MELHORIA 2: Travar Scroll (Classe Utilitária) --- */
+        body.no-scroll {
+            overflow: hidden;
         }
 
         html { scroll-behavior: smooth; }
@@ -115,6 +131,8 @@
             color: var(--secondary);
             cursor: pointer;
             transition: 0.2s;
+            position: relative;
+            z-index: 10;
         }
         .nav-link:hover { color: var(--accent); }
 
@@ -128,13 +146,15 @@
         }
 
         .brand-sub {
-            font-size: 11px;
-            letter-spacing: 7px; /* Espaçamento levemente reduzido para o novo texto */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
             text-transform: uppercase;
             color: var(--secondary);
-            margin-top: 25px;
+            margin-top: 20px;
             font-weight: 600;
             display: block;
+            opacity: 0.9;
         }
 
         .edition-bar {
@@ -157,7 +177,6 @@
             transform: translateY(-2px);
         }
 
-        /* ANIMAÇÃO E REVEAL */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
@@ -165,7 +184,6 @@
         }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* FIX MOBILE: A primeira notícia sempre aparece sem precisar scrollar */
         article:first-of-type.reveal {
             opacity: 1 !important;
             transform: translateY(0) !important;
@@ -199,7 +217,6 @@
 
         #content p { font-size: 1.25rem; line-height: 1.8; font-weight: 300; margin-bottom: 40px; }
 
-        /* BOTÕES ATUALIZADOS */
         .source-tag, .share-btn, #back-to-top {
             font-size: 10px;
             font-weight: 700;
@@ -212,8 +229,6 @@
             transition: 0.3s;
             letter-spacing: 1px;
             text-decoration: none;
-            
-            /* Centralização Perfeita */
             display: inline-flex;
             justify-content: center;
             align-items: center;
@@ -246,29 +261,125 @@
             letter-spacing: 4px;
         }
 
-        #about-box {
-            display: none;
-            background: rgba(0,0,0,0.02);
-            border: 1px solid var(--border);
-            padding: 35px;
-            margin-top: 20px;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            text-align: left;
+        /* --- PAINEL INFERIOR (BOTTOM SHEET) --- */
+        #backdrop {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
+            z-index: 4000;
+            opacity: 0; visibility: hidden;
+            transition: 0.5s ease;
+        }
+        #backdrop.active { opacity: 1; visibility: visible; }
+
+        #bottom-panel {
+            position: fixed;
+            bottom: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            border-left: 1px solid var(--border-soft);
+            border-right: 1px solid var(--border-soft);
+            z-index: 5000;
+            transition: bottom 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            
+            padding: 50px 40px;
+            padding-bottom: calc(50px + env(safe-area-inset-bottom));
+            
+            box-sizing: border-box;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column;
+            overflow: visible; 
+        }
+        
+        #bottom-panel.open { bottom: 0; }
+
+        .panel-header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-soft);
+            position: relative;
+        }
+
+        .panel-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 2rem;
+            margin: 0;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 32px; 
+            cursor: pointer; 
+            color: var(--secondary); 
+            line-height: 1;
+            width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+            z-index: 10;
+        }
+        .close-btn:hover { color: var(--accent); }
+
+        .panel-content {
+            font-size: 1.2rem; 
+            line-height: 1.6; 
+            font-weight: 300;
+            color: var(--text);
+            text-align: center; 
+            max-width: 90%;
+            margin: 0 auto;
         }
 
         @media (max-width: 768px) {
             .logo { font-size: 3.5rem; }
             .container { padding: 0 25px; }
             .edition-bar { flex-direction: column; gap: 10px; align-items: center; }
-            
-            /* No mobile, botões em coluna e ocupando largura total */
             .action-area { flex-direction: column; }
-            .source-tag, .share-btn { width: 100%; box-sizing: border-box; }
+            
+            #bottom-panel { 
+                max-width: 100%; 
+                border-left: none; 
+                border-right: none; 
+                border-radius: 15px 15px 0 0; 
+            }
+            
+            .close-btn { top: 20px; right: 20px; font-size: 28px; }
+            
+            .brand-sub { 
+                font-size: 10px; 
+                letter-spacing: 1.5px; 
+                line-height: 1.4;
+                padding: 0 10px; 
+            }
         }
     </style>
 </head>
 <body>
+
+    <div id="backdrop" onclick="toggleAbout()"></div>
+
+    <aside id="bottom-panel">
+        <span class="close-btn" onclick="toggleAbout()">×</span>
+        <div class="panel-header">
+            <h2 class="panel-title">Sobre</h2>
+        </div>
+        <div class="panel-content">
+            <p style="margin: 0;">5 notícias relevantes do mercado financeiro, curadas e resumidas por inteligência artificial.<br><br>Todo dia, às 05:00.</p>
+        </div>
+    </aside>
 
     <div id="loader">
         <div class="loader-s">S</div>
@@ -286,10 +397,7 @@
                 </div>
             </div>
             <h1 class="logo">Sem Ruído</h1>
-            <span class="brand-sub">Briefing Financeiro Diário</span>
-            <div id="about-box">
-                5 notícias relevantes do mercado financeiro, curadas e resumidas por inteligência artificial. Todo dia, às 05:00.
-            </div>
+            <span class="brand-sub">5 Notícias do Mercado às 05:00</span>
         </header>
 
         <div class="edition-bar">
@@ -357,11 +465,33 @@
             }
         })();
 
+        // --- MELHORIA 3: Scroll Travado no Pop-up ---
         function toggleAbout() {
             haptic();
-            const box = document.getElementById('about-box');
-            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+            const panel = document.getElementById('bottom-panel');
+            const backdrop = document.getElementById('backdrop');
+            const body = document.body;
+            
+            if (panel.classList.contains('open')) {
+                panel.classList.remove('open');
+                backdrop.classList.remove('active');
+                body.classList.remove('no-scroll'); // Destrava
+            } else {
+                panel.classList.add('open');
+                backdrop.classList.add('active');
+                body.classList.add('no-scroll'); // Trava
+            }
         }
+
+        // --- MELHORIA 4: Fechar com ESC ---
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                const panel = document.getElementById('bottom-panel');
+                if (panel.classList.contains('open')) {
+                    toggleAbout();
+                }
+            }
+        });
 
         function getRelativeTime(dateStr) {
             try {
@@ -442,13 +572,13 @@
                     document.getElementById('loader').classList.add('hidden');
                     const observer = new IntersectionObserver((entries) => {
                         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
-                    }, { threshold: 0.05 }); // Threshold reduzido para mobile
+                    }, { threshold: 0.05 });
                     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
                 }, 1000);
 
             } catch (e) {
-                console.error(e); // Erro no console
-                document.getElementById('loader').classList.add('hidden'); // Esconde loader
+                console.error(e);
+                document.getElementById('loader').classList.add('hidden');
                 document.getElementById('content').innerHTML = "<div style='text-align:center; padding: 50px;'><p>Sincronizando sinal...</p><small>Aguarde a próxima atualização automática.</small></div>";
             }
         }
@@ -470,4 +600,3 @@
     </script>
 </body>
 </html>
-
