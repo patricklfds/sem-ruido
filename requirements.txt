@@ -4,3 +4,4 @@ feedparser
 requests
 trafilatura
 pytz
+python-dotenv
