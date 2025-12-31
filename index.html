@@ -129,7 +129,7 @@
 
         .brand-sub {
             font-size: 11px;
-            letter-spacing: 9px;
+            letter-spacing: 7px; /* Espaçamento levemente reduzido para o novo texto */
             text-transform: uppercase;
             color: var(--secondary);
             margin-top: 25px;
@@ -157,12 +157,19 @@
             transform: translateY(-2px);
         }
 
+        /* ANIMAÇÃO E REVEAL */
         .reveal {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
         }
         .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* FIX MOBILE: A primeira notícia sempre aparece sem precisar scrollar */
+        article:first-of-type.reveal {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
 
         article { margin-bottom: 140px; }
 
@@ -192,6 +199,7 @@
 
         #content p { font-size: 1.25rem; line-height: 1.8; font-weight: 300; margin-bottom: 40px; }
 
+        /* BOTÕES ATUALIZADOS */
         .source-tag, .share-btn, #back-to-top {
             font-size: 10px;
             font-weight: 700;
@@ -204,7 +212,14 @@
             transition: 0.3s;
             letter-spacing: 1px;
             text-decoration: none;
+            
+            /* Centralização Perfeita */
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
+        
         .source-tag:hover, .share-btn:hover, #back-to-top:hover {
             background: var(--text); color: var(--bg);
         }
@@ -246,7 +261,10 @@
             .logo { font-size: 3.5rem; }
             .container { padding: 0 25px; }
             .edition-bar { flex-direction: column; gap: 10px; align-items: center; }
+            
+            /* No mobile, botões em coluna e ocupando largura total */
             .action-area { flex-direction: column; }
+            .source-tag, .share-btn { width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -268,7 +286,7 @@
                 </div>
             </div>
             <h1 class="logo">Sem Ruído</h1>
-            <span class="brand-sub">Sinal Financeiro Diário</span>
+            <span class="brand-sub">Briefing Financeiro Diário</span>
             <div id="about-box">
                 O Sem Ruído utiliza modelos de linguagem para selecionar e resumir diariamente cinco notícias relevantes do mercado financeiro, atualizadas todos os dias às 05:00.
             </div>
@@ -290,7 +308,7 @@
         </div>
 
         <footer>
-            <span class="dev-credit">Produced & Developed by <span class="dev-name">Patrick</span></span>
+            <span class="dev-credit">Feito por <span class="dev-name">Patrick</span></span>
         </footer>
     </div>
 
@@ -424,12 +442,14 @@
                     document.getElementById('loader').classList.add('hidden');
                     const observer = new IntersectionObserver((entries) => {
                         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
-                    }, { threshold: 0.1 });
+                    }, { threshold: 0.05 }); // Threshold reduzido para mobile
                     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
                 }, 1000);
 
             } catch (e) {
-                document.getElementById('content').innerHTML = "<p>Sincronizando sinal...</p>";
+                console.error(e); // Erro no console
+                document.getElementById('loader').classList.add('hidden'); // Esconde loader
+                document.getElementById('content').innerHTML = "<div style='text-align:center; padding: 50px;'><p>Sincronizando sinal...</p><small>Aguarde a próxima atualização automática.</small></div>";
             }
         }
 
