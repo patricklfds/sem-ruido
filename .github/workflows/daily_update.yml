@@ -1,0 +1,42 @@
+name: Atualização Diária Sem Ruído
+
+on:
+  schedule:
+    # Cronograma: 08:00 UTC equivale a 05:00 Horário de Brasília
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Permite rodar manualmente clicando num botão se precisar
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar bibliotecas
+        run: |
+          pip install -r requirements.txt
+
+      - name: Executar o Pipeline (Coleta, IA e JSON)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python main.py
+
+      - name: Salvar e Publicar Dados
+        run: |
+          git config --global user.name "Sem Ruído Bot"
+          git config --global user.email "bot@semruido.com"
+          git add web_data.json
+          # O comando abaixo só commita se houver mudança
+          git commit -m "Atualização diária: $(date +'%Y-%m-%d')" || exit 0
+          git push
