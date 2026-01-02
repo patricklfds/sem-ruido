@@ -47,7 +47,26 @@
             overflow: hidden;
         }
 
-        html { scroll-behavior: smooth; }
+        /* --- NOVO: SCROLLBAR PERSONALIZADA --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--secondary);
+            border-radius: 4px;
+            border: 2px solid var(--bg);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent);
+        }
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--secondary) var(--bg);
+            scroll-behavior: smooth;
+        }
 
         #bg-grid {
             position: fixed;
@@ -391,7 +410,7 @@
     <div class="container">
         <header id="main-header">
             <div class="top-nav">
-                <span class="nav-link" onclick="toggleAbout()">Sobre</span>
+                <span class="nav-link" onclick="toggleAbout()">Info</span>
                 <div>
                     <span class="nav-link" id="theme-text" onclick="toggleTheme()">Modo Escuro</span>
                 </div>
@@ -516,6 +535,10 @@
                 document.getElementById('update-date').innerText = data.last_update.split(' ')[0];
                 document.getElementById('relative-time').innerText = getRelativeTime(data.last_update);
                 
+                // NOVO: Atualiza o título da aba com a data
+                const dateShort = data.last_update.split(' ')[0].substring(0, 5);
+                document.title = `Sem Ruído | ${dateShort}`;
+                
                 let rawMd = data.content_md
                     .replace(/# RADAR FINANCEIRO.*/gi, '')
                     .replace(/Link original:/gi, '')
@@ -600,5 +623,3 @@
     </script>
 </body>
 </html>
-
-
