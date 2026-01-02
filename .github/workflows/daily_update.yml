@@ -2,8 +2,10 @@ name: Atualização Diária Sem Ruído
 
 on:
   schedule:
-    # Cronograma: 08:00 UTC equivale a 05:00 Horário de Brasília
-    - cron: '0 8 * * *'
+    # MUDANÇA 1: Cronograma ajustado
+    # 07:38 UTC = 04:38 BRT.
+    # Adiantamos 22 minutos para compensar a fila do GitHub e rodar perto das 05:00.
+    - cron: '38 7 * * *'
   workflow_dispatch: # Permite rodar manualmente clicando num botão se precisar
 
 permissions:
@@ -28,7 +30,9 @@ jobs:
 
       - name: Executar o Pipeline (Coleta, IA e JSON)
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # ATENÇÃO: Seus arquivos Python usam "API_KEY", mas seu secret é "GEMINI_API_KEY".
+          # A linha abaixo faz a conexão correta entre eles.
+          API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python main.py
 
@@ -36,7 +40,11 @@ jobs:
         run: |
           git config --global user.name "Sem Ruído Bot"
           git config --global user.email "bot@semruido.com"
-          git add web_data.json
+          
+          # MUDANÇA 2: Adicionamos 'news_history.json'
+          # Isso salva a memória do robô para ele não repetir notícias amanhã
+          git add web_data.json news_history.json
+          
           # O comando abaixo só commita se houver mudança
           git commit -m "Atualização diária: $(date +'%Y-%m-%d')" || exit 0
           git push
